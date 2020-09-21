@@ -1,0 +1,10 @@
+table.w-full.border-collapse
+    tbody
+        each row in acceleratorTableHeaders
+            th.text-gray-400.p-2.text-left.
+                #{row}
+        each row in acceleratorData
+            tr
+                each column in row
+                    td.p-2.text-left.
+                        #{column}
