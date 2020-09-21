@@ -32,20 +32,6 @@ PugHelper.acceleratorTableFunction = pug.compile(fs.readFileSync("./tables/accel
 
 function checkValidityOfData(acceleratorData, costSavingsData){
 
-    if(!acceleratorData || !costSavingsData){
-        return "No data detected";
-    }
-
-    try{
-        acceleratorData = acceleratorData.replace(/'/g, '');
-        acceleratorData = JSON.parse(acceleratorData);
-
-        costSavingsData = costSavingsData.replace(/'/g, '');
-        costSavingsData = JSON.parse(costSavingsData);
-    }catch(e){
-        return "Invalid json";
-    }
-
     if(!acceleratorData.length || !costSavingsData.length){
         return "Invalid length"
     }
@@ -67,12 +53,40 @@ app.get('/', (req, apiRes) => {
 
     //console.log(req.query);
     let {acceleratorData, costSavingsData} = req.query || {};
-    const validationError = checkValidityOfData(acceleratorData, costSavingsData);
+    let validationError;
+    
+
+    if(!acceleratorData || !costSavingsData){
+        validationError = "No data detected";
+    }
+
+    try{
+        if(validationError){
+            return apiRes.status(400).send(validationError);
+        }
+        acceleratorData = acceleratorData.replace(/'/g, '');
+        acceleratorData = JSON.parse(acceleratorData);
+
+        costSavingsData = costSavingsData.replace(/'/g, '');
+        costSavingsData = JSON.parse(costSavingsData);
+
+        const vvv = checkValidityOfData(acceleratorData, costSavingsData);
+
+        validationError = checkValidityOfData(acceleratorData, costSavingsData) || validationError;
+
+        if(validationError){
+            return apiRes.status(400).send(validationError || error);
+        }
+    }catch(e){
+        console.log({e});
+        validationError = "Invalid json";
+    }
+
     if(validationError){
         return apiRes.status(400).send(validationError);
     }
 
-    var html;
+    var html = printHtmlCode;
 
     console.time("pugCompilation");
     try{
@@ -80,7 +94,6 @@ app.get('/', (req, apiRes) => {
         html = html.replace("<!--_pug_replace_costs_savings_table-->", PugHelper.costSavingsTableFunction({costSavingsHeaders, costSavingsData}));
     }catch(e){
         console.log("Error parsing...",{e});
-        console.log({e: e.msg, line: e.line});
     }
     console.timeEnd("pugCompilation");
 
