@@ -51,6 +51,8 @@ function checkValidityOfData(acceleratorData, costSavingsData){
 
 app.get('/', (req, apiRes) => {
 
+    // http://localhost:3000/?acceleratorData='[["1x / butterfly","37550 USD","69517 USD","149434 USD"],["3x / year","81050 USD","142017 USD","294434 USD"],["5x / year","124550 USD","214517 USD","439434 USD"],["10x / year","233300 USD","395767 USD","801934 USD"]]'&costSavingsData='[["3 Years","15800 USD"],["5 Years","33267 USD"],["10 Years","76934 USD"]]'
+
     //console.log(req.query);
     let {acceleratorData, costSavingsData} = req.query || {};
     let validationError;
